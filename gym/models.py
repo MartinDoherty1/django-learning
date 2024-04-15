@@ -30,6 +30,10 @@ class Exercise(models.Model):
         elif self.type == "BW":
             return "Body Weight"
 
+class Workouts(models.Model):
+    workout_name = models.TextField(max_length=30, unique=True, null=False, blank=False)
+    exercise = models.ManyToManyField(to=Exercise, related_name="workouts")
+
 
 class Sets(models.Model):
     setNumber = models.IntegerField()

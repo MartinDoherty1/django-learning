@@ -4,6 +4,7 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'exercises', views.ExerciseViewSet)
+router.register(r'workouts', views.WorkoutViewSet)
 router.register(r'sets', views.SetsViewSet)
 
 urlpatterns = [

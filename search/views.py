@@ -2,10 +2,12 @@
 
 import abc
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from elasticsearch_dsl import Q, Search, A
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
+from core.validator import Auth0JWTBearerTokenValidator
+from authlib.integrations.django_oauth2 import ResourceProtector
 
 from blog.documents import ArticleDocument, UserDocument, CategoryDocument
 from blog.serializers import ArticleSerializer, UserSerializer, CategorySerializer
@@ -13,6 +15,14 @@ from blog.serializers import ArticleSerializer, UserSerializer, CategorySerializ
 from gym.serializers import ExerciseSerializer, AggregationSerializer
 from gym.documents import ExerciseDocument
 
+# require_auth = ResourceProtector()
+# validator = Auth0JWTBearerTokenValidator("auth0 Domain", "Audience")
+# require_auth.register_token_validator(validator)
+
+# @require_auth(None)
+def test_auth(request):
+    response = "hello from private"
+    return JsonResponse(dict(response=response))
 
 class PaginatedElasticSearchAggAPIView(APIView, LimitOffsetPagination):
     serializer_class = None

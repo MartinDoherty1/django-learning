@@ -16,6 +16,9 @@ create-dev-env:	requirements.txt
 	$(PYTHON) -m pip install --upgrade pip
 	$(PIP) install -r requirements.txt
 
+new-DB:
+	(docker ps -a | grep 'postgresCont' && docker rm -f postgresCont) > /dev/null 2>&1 || echo "postgres container does not exist"
+	docker start postgresCont  > /dev/null 2>&1 || docker run -d --name postgresCont -p 5432:5432 -e POSTGRES_PASSWORD=pass123 -e POSTGRES_DB=djangotest postgres
 clean:
 	rm -rf __pycache__
 	rm -rf $(VENV)
@@ -28,6 +31,7 @@ test:
 	yes | $(PYTHON) manage.py search_index --rebuild
 
 .PHONY: Migrate
+
 Migrate:
 	$(PYTHON) manage.py makemigrations
 	$(PYTHON) manage.py migrate
@@ -39,3 +43,5 @@ testData: Migrate
 	$(PYTHON) manage.py populate_db
 	$(PYTHON) manage.py populate_exercises
 	yes | $(PYTHON) manage.py search_index --rebuild
+
+fresh-DB : new-DB testData
