@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-(_!#4b7ufs4e4il_fj9u!hcp(i_+4gzlr5t_r@q7$&%t$bge=i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Application definition
 
@@ -37,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'django_elasticsearch_dsl',
     'blog.apps.BlogConfig',
     'search.apps.SearchConfig',
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -55,6 +56,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
 
 TEMPLATES = [
     {
@@ -83,9 +89,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'djangotest',
         "USER": os.environ.get('POSTGRES_USERNAME', 'postgres'),
-        "PASSWORD": os.environ.get('POSTGRES_PASSWORD', ''),
-        "HOST": "localhost",
-        "port": "5432"
+        "PASSWORD": os.environ.get('POSTGRES_PASSWORD', 'pass123'),
+        "HOST": os.environ.get('POSTGRES_HOST', 'localhost'),
+        "port": 5432
     }
 }
 
@@ -139,7 +145,7 @@ REST_FRAMEWORK = {
 ELASTICSEARCH_DSL = {
     "default": {
         "hosts": "https://localhost:9200",
-        "http_auth": ("elastic", os.environ.get("ELASTIC_PASSWORD", "")),
+        "http_auth": ("elastic", os.environ.get("ELASTIC_PASSWORD", "test1231")),
         "ca_certs": "http_ca.crt",
     }
 }

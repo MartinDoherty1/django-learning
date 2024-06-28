@@ -1,0 +1,70 @@
+name: Django CI
+
+on:
+  push:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres_main:
+        image: postgres
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: djangotest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+
+      elasticsearch_main:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+        env:
+          discovery.type: single-node
+          ELASTIC_PASSWORD: test1231
+        ports:
+          - 9200:9200
+        options: >-
+          --name elasticcontainer
+
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.12.1]
+
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run Tests
+      run: | 
+        docker cp elasticcontainer:/usr/share/elasticsearch/config/certs/http_ca.crt .
+        sleep 30
+        python manage.py makemigrations
+        python manage.py migrate
+        yes | python manage.py search_index --rebuild
+        pytest --cov=. --cov-config=.coveragerc
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: martin-doherty1/django-learning

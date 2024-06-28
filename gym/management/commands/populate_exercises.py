@@ -13,11 +13,17 @@ class Command(BaseCommand):
             return
         
         # create Exercises
-        exercise1 = Exercise.objects.create(exercise_name="bench press", body_part="chest")
+        exercise1 = Exercise.objects.create(exercise_name="bench press", body_part="chest",
+                                            description='stronger pec muscles', type='BB')
         exercise1.save()
 
-        exercise2 = Exercise.objects.create(exercise_name="squat", body_part="legs")
+        exercise2 = Exercise.objects.create(exercise_name="squat", body_part="legs",
+                                            description="stronger leg muscles", type="BB")
         exercise2.save()
+
+        exercise3 = Exercise.objects.create(exercise_name="squat3", body_part="legs",
+                                            description="stronger leg muscles", type="BB")
+        exercise3.save()
 
         # create Sets
         set1 = Sets.objects.create(setNumber=1, setReps=8)
